@@ -219,7 +219,7 @@ allow mongod_t proc_t:lnk_file { getattr read };
 allow mongod_t self:capability net_bind_service;
 allow mongod_t self:process execmem;
 allow mongod_t self:tcp_socket { accept bind connect name_connect create getattr getopt listen setopt shutdown read write };
-allow mongod_t self:udp_socket { create connect write };
+allow mongod_t self:udp_socket { create connect read write };
 allow mongod_t shell_exec_t:file { getattr open map read ioctl lock execute execute_no_trans };
 allow mongod_t shell_exec_t:file map;
 allow mongod_t sysctl_net_t:dir { getattr search open read lock ioctl };
