@@ -1,320 +1,174 @@
-# MongoDB SELinux policy
-# Copyright (C) 2021  MongoDB Inc.
+policy_module(mongodb, 2.0.0)
+
+########################################
 #
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# Declarations
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-
-module mongodb 2.0.0;
-
-require {
-    type bin_t;
-    type cert_t;
-    type cgroup_t;
-    type default_context_t;
-    type device_t;
-    type etc_runtime_t;
-    type etc_t;
-    type file_context_t;
-    type fs_t;
-    type http_port_t;
-    type init_t;
-    type init_tmp_t;
-    type init_var_run_t;
-    type kerberos_client_packet_t;
-    type kerberos_port_t;
-    type krb5_conf_t;
-    type krb5_home_t;
-    type krb5_host_rcache_t;
-    type krb5kdc_conf_t;
-    type krb5_keytab_t;
-    type ldap_client_packet_t;
-    type ldap_port_t;
-    type locale_t;
-    type mongod_exec_t;
-    type mongod_log_t;
-    type mongod_port_t;
-    type mongod_runtime_t;
-    type mongod_t;
-    type mongod_var_lib_t;
-    type net_conf_t;
-    type netif_t;
-    type netlabel_peer_t;
-    type node_t;
-    type ocsp_client_packet_t;
-    type ocsp_port_t;
-    type proc_t;
-    type proc_net_t;
-    type rpm_script_t;
-    type security_t;
-    type selinux_config_t;
-    type shell_exec_t;
-    type snmp_client_packet_t;
-    type snmpd_t;
-    type snmpd_var_lib_t;
-    type snmp_port_t;
-    type sysctl_t;
-    type sysctl_net_t;
-    type sysctl_vm_t;
-    type sysfs_t;
-    type tmpfs_t;
-    type tmp_t;
-    type unconfined_service_t;
-    type unconfined_t;
-    type urandom_device_t;
-    type usr_t;
-    type var_lib_t;
-    type var_log_t;
-    type var_run_t;
-    type var_t;
-
-    attribute base_ro_file_type;
-    attribute corenet_unlabeled_type;
-    attribute daemon;
-    attribute direct_run_init;
-    attribute direct_init;
-    attribute direct_init_entry;
-    attribute domain;
-    attribute entry_type;
-    attribute exec_type;
-    attribute filesystem_type;
-    attribute file_type;
-    attribute non_security_file_type;
-    attribute non_auth_file_type;
-    attribute initrc_domain;
-    attribute initrc_transition_domain;
-    attribute kernel_system_state_reader;
-    attribute logfile;
-    attribute netlabel_peer_type;
-    attribute pidfile;
-    attribute syslog_client_type;
-    attribute systemd_unit_file_type;
-
-    class association { sendto recvfrom setcontext polmatch };
-    class capability { chown dac_override dac_read_search fowner fsetid kill setgid setuid setpcap linux_immutable net_bind_service net_broadcast net_admin net_raw ipc_lock ipc_owner sys_module sys_rawio sys_chroot sys_ptrace sys_pacct sys_admin sys_boot sys_nice sys_resource sys_time sys_tty_config mknod lease audit_write audit_control setfcap };
-    class chr_file { ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute swapon quotaon mounton execute_no_trans entrypoint execmod open audit_access };
-    class dir { ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute swapon quotaon mounton add_name remove_name reparent search rmdir open audit_access execmod };
-    class fifo_file { ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute swapon quotaon mounton open audit_access execmod };
-    class file { ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute swapon quotaon mounton execute_no_trans entrypoint execmod open audit_access };
-    class filesystem { mount remount unmount getattr relabelfrom relabelto transition associate quotamod quotaget };
-    class lnk_file { ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute swapon quotaon mounton open audit_access execmod };
-    class packet { send recv relabelto flow_in flow_out forward_in forward_out };
-    class peer { recv };
-    class process { fork transition sigchld sigkill sigstop signull signal ptrace getsched setsched getsession getpgid setpgid getcap setcap share getattr setexec setfscreate noatsecure siginh setrlimit rlimitinh dyntransition setcurrent execmem execstack execheap setkeycreate setsockcreate getrlimit };
-    class node { tcp_recv tcp_send udp_recv udp_send rawip_recv rawip_send enforce_dest dccp_recv dccp_send recvfrom sendto };
-    class netif { tcp_recv tcp_send udp_recv udp_send rawip_recv rawip_send dccp_recv dccp_send ingress egress };
-    class service { start status stop };
-    class security { compute_av compute_create compute_member check_context load_policy compute_relabel compute_user setenforce setbool setsecparam setcheckreqprot read_policy validate_trans };
-    class sock_file { ioctl read write create getattr setattr lock relabelfrom relabelto append map unlink link rename execute swapon quotaon mounton open audit_access execmod };
-    class socket { ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto recv_msg send_msg name_bind };
-    class netlink_route_socket { ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto recv_msg send_msg name_bind nlmsg_read nlmsg_write };
-    class tcp_socket { ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto recv_msg send_msg name_bind connectto newconn acceptfrom node_bind name_connect };
-    class udp_socket { ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto recv_msg send_msg name_bind node_bind };
-    class unix_stream_socket { ioctl read write create getattr setattr lock relabelfrom relabelto append map bind connect listen accept getopt setopt shutdown recvfrom sendto recv_msg send_msg name_bind connectto newconn acceptfrom };
-};
-
 
 type mongod_t;
-typeattribute mongod_t corenet_unlabeled_type;
-typeattribute mongod_t daemon;
-typeattribute mongod_t domain;
-typeattribute mongod_t kernel_system_state_reader;
-typeattribute mongod_t netlabel_peer_type;
-typeattribute mongod_t syslog_client_type;
-
 type mongod_exec_t;
-typeattribute mongod_exec_t direct_init_entry;
-typeattribute mongod_exec_t entry_type;
-typeattribute mongod_exec_t exec_type;
-typeattribute mongod_exec_t file_type;
-typeattribute mongod_exec_t non_auth_file_type;
-typeattribute mongod_exec_t non_security_file_type;
+init_daemon_domain(mongod_t, mongod_exec_t)
 
 type mongod_log_t;
-typeattribute mongod_log_t file_type;
-typeattribute mongod_log_t logfile;
-typeattribute mongod_log_t non_auth_file_type;
-typeattribute mongod_log_t non_security_file_type;
+logging_log_file(mongod_log_t)
 
 type mongod_runtime_t alias mongod_var_run_t;
-typeattribute mongod_runtime_t file_type;
-typeattribute mongod_runtime_t non_auth_file_type;
-typeattribute mongod_runtime_t non_security_file_type;
-typeattribute mongod_runtime_t pidfile;
+require { attribute file_type, non_security_file_type, non_auth_file_type, pidfile; }
+typeattribute mongod_runtime_t file_type, non_security_file_type, non_auth_file_type, pidfile;
 
 type mongod_var_lib_t;
-typeattribute mongod_var_lib_t file_type;
-typeattribute mongod_var_lib_t non_auth_file_type;
-typeattribute mongod_var_lib_t non_security_file_type;
+files_type(mongod_var_lib_t)
 
-type mongod_unit_file_t;
-typeattribute mongod_unit_file_t systemd_unit_file_type;
-typeattribute mongod_unit_file_t file_type;
-typeattribute mongod_unit_file_t non_security_file_type;
-typeattribute mongod_unit_file_t non_auth_file_type;
+# port is defined by refpolicy as:
+# network_port(mongod, tcp,27017-27019,s0, tcp, 28017-28019,s0)
 
-# -----------------------------------------------------------------------------------
+########################################
+#
+# Local policy
+#
 
-type_transition initrc_domain mongod_exec_t:process mongod_t;
+require {
+    type tmp_t;
+    class netlink_route_socket { read write bind create getattr nlmsg_read };
+    class udp_socket { read write create connect getattr bind getopt setopt };
+    class tcp_socket { read write connect accept bind create getattr getopt listen setopt shutdown };
+    class sock_file { create setattr unlink };
+}
+
+allow mongod_t self:process { setsched signal execmem };
+allow mongod_t self:fifo_file rw_fifo_file_perms;
+allow mongod_t self:unix_stream_socket { connectto accept listen };
+allow mongod_t self:netlink_route_socket { read write bind create getattr nlmsg_read };
+allow mongod_t self:tcp_socket { read write create connect bind getattr getopt setopt accept listen shutdown };
+allow mongod_t self:udp_socket { read write create connect bind getattr getopt setopt };
+
+miscfiles_read_generic_certs(mongod_t)
+
+manage_dirs_pattern(mongod_t, mongod_log_t, mongod_log_t)
+append_files_pattern(mongod_t, mongod_log_t, mongod_log_t)
+create_files_pattern(mongod_t, mongod_log_t, mongod_log_t)
+rename_files_pattern(mongod_t, mongod_log_t, mongod_log_t)
+setattr_files_pattern(mongod_t, mongod_log_t, mongod_log_t)
+logging_log_filetrans(mongod_t, mongod_log_t, dir)
+
+manage_dirs_pattern(mongod_t, mongod_var_lib_t, mongod_var_lib_t)
+manage_files_pattern(mongod_t, mongod_var_lib_t, mongod_var_lib_t)
+files_var_lib_filetrans(mongod_t, mongod_var_lib_t, dir)
+
+manage_dirs_pattern(mongod_t, mongod_runtime_t, mongod_runtime_t)
+manage_files_pattern(mongod_t, mongod_runtime_t, mongod_runtime_t)
+files_pid_filetrans(mongod_t, mongod_runtime_t, { dir file sock_file })
+
+require { type var_t, var_run_t; }
+allow mongod_t var_t:dir { getattr search open };
+allow mongod_t var_run_t:lnk_file { getattr read };
+allow mongod_t var_run_t:dir { open read getattr lock search ioctl add_name remove_name write };
 type_transition mongod_t var_run_t:dir mongod_runtime_t;
 
-allow init_t mongod_unit_file_t:file { open read };
-allow mongod_t bin_t:dir { getattr search open read lock ioctl };
-allow mongod_t bin_t:file { { getattr open map read execute ioctl } ioctl lock execute_no_trans };
-allow mongod_t bin_t:lnk_file { getattr read };
-allow mongod_t cert_t:dir { search getattr open read lock ioctl };
-allow mongod_t cert_t:file { open getattr read ioctl lock };
-allow mongod_t cert_t:lnk_file { getattr read };
-allow mongod_t cgroup_t:dir { getattr search open };
-allow mongod_t cgroup_t:file { open { getattr read ioctl lock } };
-allow mongod_t cgroup_t:lnk_file { getattr read };
-allow mongod_t device_t:dir { getattr search open };
-allow mongod_t etc_runtime_t:file { open { getattr read ioctl lock } };
-allow mongod_t etc_runtime_t:lnk_file { getattr read };
-allow mongod_t etc_t:dir { getattr search open read lock ioctl };
-allow mongod_t etc_t:file { open { getattr read ioctl lock } };
-allow mongod_t etc_t:lnk_file { getattr read };
-allow mongod_t filesystem_type:filesystem getattr;
-allow mongod_t file_type:filesystem getattr;
-allow mongod_t http_port_t:tcp_socket { name_connect send_msg recv_msg };
-allow mongod_t init_var_run_t:dir { getattr search open };
-allow mongod_t locale_t:dir { getattr search open read lock ioctl };
-allow mongod_t locale_t:file map;
-allow mongod_t locale_t:file { open getattr read ioctl lock };
-allow mongod_t locale_t:lnk_file { getattr read };
-allow mongod_t mongod_exec_t:file { open entrypoint getattr execute read map };
-allow mongod_t mongod_log_t:dir { add_name create open getattr setattr read write link unlink rename remove_name search add_name remove_name reparent rmdir lock ioctl };
-allow mongod_t mongod_log_t:file { create open lock ioctl getattr setattr append };
-allow mongod_t mongod_port_t:tcp_socket { name_bind name_connect };
-allow mongod_t mongod_port_t:udp_socket { name_bind };
-allow mongod_t mongod_runtime_t:dir { add_name remove_name create open getattr setattr read write link unlink rename search add_name remove_name reparent rmdir lock ioctl };
-allow mongod_t mongod_runtime_t:file { create open getattr setattr read write append rename link unlink ioctl lock };
-allow mongod_t mongod_var_lib_t:dir { add_name remove_name create open getattr setattr read write link unlink rename search add_name remove_name reparent rmdir lock ioctl };
-allow mongod_t mongod_var_lib_t:file { create open getattr setattr read write append rename link unlink ioctl lock };
-allow mongod_t net_conf_t:dir { getattr search open read lock ioctl };
-allow mongod_t net_conf_t:file { open getattr read ioctl lock };
-allow mongod_t net_conf_t:lnk_file { getattr read };
-allow mongod_t netif_t:netif { tcp_send tcp_recv egress ingress };
-allow mongod_t node_t:node { tcp_send tcp_recv sendto recvfrom };
-allow mongod_t node_t:tcp_socket { node_bind };
-allow mongod_t ocsp_client_packet_t:packet { recv send };
-allow mongod_t ocsp_port_t:tcp_socket name_connect;
-allow mongod_t pidfile:dir { getattr search open };
-allow mongod_t proc_net_t:dir { getattr search open read lock ioctl };
-allow mongod_t proc_net_t:file { open getattr read ioctl lock };
-allow mongod_t proc_net_t:lnk_file { getattr read };
-allow mongod_t proc_t:dir { getattr search open read lock ioctl };
-allow mongod_t proc_t:lnk_file { getattr read };
-allow mongod_t self:capability net_bind_service;
-allow mongod_t self:process execmem;
-allow mongod_t self:tcp_socket { accept bind connect name_connect create getattr getopt listen setopt shutdown read write };
-allow mongod_t self:udp_socket { create connect write };
-allow mongod_t shell_exec_t:file { getattr open map read ioctl lock execute execute_no_trans };
-allow mongod_t shell_exec_t:file map;
-allow mongod_t sysctl_net_t:dir { getattr search open read lock ioctl };
-allow mongod_t sysctl_net_t:file { open { getattr read ioctl lock } };
-allow mongod_t sysctl_net_t:lnk_file { getattr read };
-allow mongod_t sysctl_t:dir { getattr search open };
-allow mongod_t sysctl_vm_t:dir { getattr search open };
-allow mongod_t sysctl_vm_t:dir { getattr search open read lock ioctl };
-allow mongod_t sysctl_vm_t:file { open getattr read ioctl lock };
-allow mongod_t sysfs_t:dir { getattr search open read lock ioctl };
-allow mongod_t sysfs_t:file { open { getattr read ioctl lock } };
-allow mongod_t sysfs_t:lnk_file { getattr read };
-allow mongod_t tmpfs_t:dir { open read getattr lock search ioctl add_name remove_name write };
-allow mongod_t tmpfs_t:sock_file { create open getattr setattr read write rename link unlink ioctl lock append };
-allow mongod_t tmp_t:dir { open read getattr lock search ioctl add_name remove_name write };
-allow mongod_t tmp_t:lnk_file { getattr read };
+# this is required to create mongodb-XXXXX.sock files
+files_rw_generic_tmp_dir(mongod_t)
+fs_manage_tmpfs_sockets(mongod_t)
 allow mongod_t tmp_t:sock_file { create setattr unlink };
-allow mongod_t urandom_device_t:chr_file { getattr open read lock ioctl };
-allow mongod_t usr_t:dir { getattr search open };
-allow mongod_t var_lib_t:dir { open read getattr lock search ioctl add_name remove_name write };
-allow mongod_t var_log_t:dir { open read getattr lock search ioctl add_name remove_name write };
-allow mongod_t var_run_t:dir { open read getattr lock search ioctl add_name remove_name write };
-allow mongod_t var_run_t:file { create getattr open setattr write };
-allow mongod_t var_run_t:lnk_file { getattr read };
-allow mongod_t var_t:dir { getattr search open };
-allow unconfined_t mongod_unit_file_t:service { start status stop };
 
-bool mongod_can_connect_snmp false;
-if (mongod_can_connect_snmp) {
-    allow init_t snmpd_var_lib_t:dir read;
-    allow mongod_t netlabel_peer_t:peer recv;
-    allow mongod_t netlabel_peer_t:tcp_socket recvfrom;
-    allow mongod_t self:association sendto;
-    allow mongod_t self:capability net_bind_service;
-    allow mongod_t snmp_client_packet_t:packet recv;
-    allow mongod_t snmp_client_packet_t:packet send;
-    allow mongod_t snmpd_t:association recvfrom;
-    allow mongod_t snmpd_t:peer recv;
-    allow mongod_t snmpd_t:tcp_socket recvfrom;
-    allow mongod_t snmpd_t:unix_stream_socket connectto;
-    allow mongod_t snmpd_var_lib_t:dir { getattr search open read lock ioctl };
-    allow mongod_t snmpd_var_lib_t:file { open { getattr read ioctl lock } };
-    allow mongod_t snmpd_var_lib_t:lnk_file { getattr read };
-    allow mongod_t snmpd_var_lib_t:sock_file { getattr write open append };
-    allow mongod_t snmp_port_t:tcp_socket name_bind;
-    allow mongod_t snmp_port_t:tcp_socket name_connect;
-    allow mongod_t snmp_port_t:tcp_socket { send_msg recv_msg };
-    allow mongod_t snmp_port_t:udp_socket name_bind;
-    allow mongod_t var_lib_t:dir { getattr search open };
-    allow mongod_t var_t:dir { getattr search open };
-    allow snmpd_t mongod_t:association recvfrom;
-    allow snmpd_t mongod_t:peer recv;
-    allow snmpd_t mongod_t:tcp_socket recvfrom;
-    allow snmpd_t netlabel_peer_t:peer recv;
-    allow snmpd_t netlabel_peer_t:tcp_socket recvfrom;
-    allow snmpd_t self:association sendto;
-}
+kernel_read_system_state(mongod_t)
+kernel_read_network_state(mongod_t)
+kernel_read_net_sysctls(mongod_t)
+kernel_read_vm_sysctls(mongod_t)
+logging_send_syslog_msg(mongod_t)
+sysnet_read_config(mongod_t)
 
+corecmd_exec_bin(mongod_t)
+corecmd_exec_shell(mongod_t)
 
-bool mongod_can_connect_ldap false;
-if (mongod_can_connect_ldap) {
-    allow mongod_t ldap_port_t:tcp_socket name_connect;
-    allow mongod_t ldap_client_packet_t:packet send;
-    allow mongod_t ldap_client_packet_t:packet recv;
-}
+corenet_all_recvfrom_netlabel(mongod_t)
+corenet_all_recvfrom_unlabeled(mongod_t)
+corenet_tcp_connect_mongod_port(mongod_t)
+corenet_tcp_bind_mongod_port(mongod_t)
+corenet_tcp_sendrecv_generic_if(mongod_t)
+corenet_tcp_sendrecv_generic_node(mongod_t)
+corenet_udp_bind_mongod_port(mongod_t)
+corenet_tcp_connect_ocsp_port(mongod_t)
+corenet_sendrecv_ocsp_client_packets(mongod_t)
+corenet_tcp_connect_http_port(mongod_t)
+corenet_tcp_sendrecv_http_port(mongod_t)
+corenet_tcp_bind_generic_node(mongod_t)
 
-bool mongod_can_use_kerberos false;
-if (mongod_can_use_kerberos) {
-    allow mongod_t default_context_t:dir { getattr search open };
-    allow mongod_t etc_t:dir { getattr search open };
-    allow mongod_t file_context_t:dir { getattr search open read lock ioctl };
-    allow mongod_t file_context_t:file { map open getattr read ioctl lock };
-    allow mongod_t file_context_t:lnk_file { getattr read };
-    allow mongod_t init_tmp_t:file write;
-    allow mongod_t kerberos_client_packet_t:packet recv;
-    allow mongod_t kerberos_client_packet_t:packet send;
-    allow mongod_t kerberos_port_t:tcp_socket { name_connect send_msg recv_msg };
-    allow mongod_t kerberos_port_t:udp_socket { recv_msg send_msg };
-    allow mongod_t krb5_conf_t:dir { getattr search open read lock ioctl };
-    allow mongod_t krb5_conf_t:file { getattr open read ioctl lock };
-    allow mongod_t krb5_keytab_t:file { open getattr read ioctl lock };
-    allow mongod_t node_t:tcp_socket node_bind;
-    allow mongod_t node_t:udp_socket node_bind;
-    allow mongod_t proc_t:filesystem associate;
-    allow mongod_t self:dir { add_name write };
-    allow mongod_t self:netlink_route_socket create;
-    allow mongod_t self:process setfscreate;
-    allow mongod_t selinux_config_t:dir { getattr search open };
-    allow mongod_t tmp_t:dir { open read getattr lock search ioctl add_name remove_name write };
-    allow mongod_t tmp_t:file { create open getattr setattr read write append rename link unlink ioctl lock };
+dev_read_sysfs(mongod_t)
+dev_read_urand(mongod_t)
+
+files_read_etc_files(mongod_t)
+fs_getattr_all_fs(mongod_t)
+miscfiles_read_localization(mongod_t)
+
+# cgroup memory
+fs_search_cgroup_dirs(mongod_t)
+fs_read_cgroup_files(mongod_t)
+
+# /proc/net
+kernel_list_proc(mongod_t)
+kernel_read_proc_symlinks(mongod_t)
+
+## <desc>
+## <p>
+## Allow mongodb to access SNMP service
+## </p>
+## </desc>
+gen_tunable(mongod_can_connect_snmp, false)
+tunable_policy(`mongod_can_connect_snmp',`
+    corenet_udp_bind_snmp_port(mongod_t)
+    corenet_tcp_bind_snmp_port(mongod_t)
+    snmp_stream_connect(mongod_t)
+    snmp_tcp_connect(mongod_t)
+    snmp_read_snmp_var_lib_files(mongod_t)
+    snmp_read_snmp_var_lib_dirs(mongod_t)
+')
+
+## <desc>
+## <p>
+## Allow mongodb to connect to LDAP servers
+## </p>
+## </desc>
+gen_tunable(mongod_can_connect_ldap, false)
+tunable_policy(`mongod_can_connect_ldap',`
+    corenet_tcp_sendrecv_ldap_port(mongod_t)
+    corenet_tcp_connect_ldap_port(mongod_t)
+    corenet_sendrecv_ldap_client_packets(mongod_t)
+')
+
+## <desc>
+## <p>
+## Allow mongodb to use Kerberos
+## </p>
+## </desc>
+gen_tunable(mongod_can_use_kerberos, false)
+tunable_policy(`mongod_can_use_kerberos',`
+    gen_require(`
+        type krb5_conf_t, krb5kdc_conf_t;
+        type krb5_host_rcache_t;
+        class dir write;
+    ')
+
+    files_search_etc(mongod_t)
+    read_files_pattern(mongod_t, krb5_conf_t, krb5_conf_t)
+    getattr_files_pattern(mongod_t, krb5_conf_t, krb5_conf_t)
+    list_dirs_pattern(mongod_t, krb5_conf_t, krb5_conf_t)
     dontaudit mongod_t krb5_conf_t:file write;
-    dontaudit mongod_t krb5kdc_conf_t:dir { getattr search open read lock ioctl };
-    dontaudit mongod_t krb5kdc_conf_t:file { open getattr read write append ioctl lock };
-    dontaudit mongod_t security_t:dir { getattr search open read lock ioctl };
-    dontaudit mongod_t security_t:file { open getattr read write append ioctl lock };
-    dontaudit mongod_t security_t:security check_context;
+    dontaudit mongod_t krb5kdc_conf_t:dir list_dir_perms;
+    dontaudit mongod_t krb5kdc_conf_t:file rw_file_perms;
     dontaudit mongod_t self:process setfscreate;
-}
+    selinux_dontaudit_validate_context(mongod_t)
+
+    kerberos_read_config(mongod_t)
+    kerberos_read_keytab(mongod_t)
+
+    corenet_tcp_connect_kerberos_port(mongod_t)
+    corenet_sendrecv_kerberos_client_packets(mongod_t)
+    corenet_tcp_sendrecv_kerberos_port(mongod_t)
+    corenet_udp_sendrecv_kerberos_port(mongod_t)
+    corenet_tcp_bind_generic_node(mongod_t)
+    corenet_udp_bind_generic_node(mongod_t)
+    seutil_read_file_contexts(mongod_t)
+
+    # this is needed to create files in /var/tmp
+    files_manage_generic_tmp_files(mongod_t)
+')
