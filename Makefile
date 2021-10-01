@@ -22,13 +22,14 @@ datadir = /usr/share
 default: build/$(selinuxvariant)/mongodb.pp
 
 build/$(selinuxvariant)/mongodb.pp: selinux/mongodb.te selinux/mongodb.fc
+	(cd selinux; make -f /usr/share/selinux/devel/Makefile)
 	mkdir -p build/$(selinuxvariant)
-	/usr/bin/checkmodule -M -m selinux/mongodb.te -o build/$(selinuxvariant)/mongodb.mod
-	/usr/bin/semodule_package -o build/$(selinuxvariant)/mongodb.pp -m build/$(selinuxvariant)/mongodb.mod -f selinux/mongodb.fc
+	mv selinux/mongodb.pp build/$(selinuxvariant)/
 
 .PHONY: clean
 clean:
 	rm -rf build
+	(cd selinux; make -f /usr/share/selinux/devel/Makefile clean)
 
 .PHONY: install
 install: build/$(selinuxvariant)/mongodb.pp

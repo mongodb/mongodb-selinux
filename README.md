@@ -23,6 +23,7 @@ You will need to install following packages in order to apply this policy:
 * make
 * checkpolicy
 * policycoreutils
+* selinux-policy-devel
 
 ### to apply policy:
 
