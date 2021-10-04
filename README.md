@@ -1,6 +1,6 @@
 # SELinux policy for MongoDB
 
-This is an official SELinux policy for MongoDB server
+This is the official SELinux policy for the MongoDB server.
 
 Security-Enhanced Linux (SELinux) is an implementation of mandatory access controls (MAC)
 in the Linux kernel, checking for allowed operations after standard discretionary access
@@ -8,9 +8,9 @@ controls (DAC) are checked.
 
 ## Scope
 
-* policies apply to computers running RHEL7 and RHEL8 only
-* cover standard mongodb-server systemd based installations only
-* both community and enterprise versions are supported
+* policies apply to computers running RHEL7 and RHEL8 only.
+* covers standard mongodb-server systemd based installations only.
+* both community and enterprise versions are supported.
 
 Supplied policies do not cover any daemons or tools other than mongod, such as: mongos,
 mongocryptd, or mongo shell
