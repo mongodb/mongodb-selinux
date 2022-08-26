@@ -72,6 +72,7 @@ allow mongod_t tmp_t:sock_file { create setattr unlink };
 
 kernel_read_system_state(mongod_t)
 kernel_read_network_state(mongod_t)
+kernel_read_fs_sysctls(mongod_t)
 kernel_read_net_sysctls(mongod_t)
 kernel_read_vm_sysctls(mongod_t)
 logging_send_syslog_msg(mongod_t)
