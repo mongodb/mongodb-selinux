@@ -13,11 +13,14 @@ type mongod_log_t;
 logging_log_file(mongod_log_t)
 
 type mongod_runtime_t alias mongod_var_run_t;
-require { attribute file_type, non_security_file_type, non_auth_file_type, pidfile; }
+require { attribute file_type, non_security_file_type, non_auth_file_type, pidfile, systemd_unit_file_type; }
 typeattribute mongod_runtime_t file_type, non_security_file_type, non_auth_file_type, pidfile;
 
 type mongod_var_lib_t;
 files_type(mongod_var_lib_t)
+
+type mongod_unit_file_t;
+typeattribute mongod_unit_file_t file_type, non_security_file_type, non_auth_file_type, systemd_unit_file_type;
 
 # port is defined by refpolicy as:
 # network_port(mongod, tcp,27017-27019,s0, tcp, 28017-28019,s0)
