@@ -15,7 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-/usr/bin/mongod	            --  gen_context(system_u:object_r:mongod_exec_t,s0)
-/var/lib/mongo(/.*)?	        gen_context(system_u:object_r:mongod_var_lib_t,s0)
-/var/log/mongodb(/.*)? 	        gen_context(system_u:object_r:mongod_log_t,s0)
-/run/mongodb(/.*)?	            gen_context(system_u:object_r:mongod_runtime_t,s0)
+/usr/bin/mongod	                    --  gen_context(system_u:object_r:mongod_exec_t,s0)
+/var/lib/mongo(/.*)?	                gen_context(system_u:object_r:mongod_var_lib_t,s0)
+/var/log/mongodb(/.*)? 	                gen_context(system_u:object_r:mongod_log_t,s0)
+/run/mongodb(/.*)?	                    gen_context(system_u:object_r:mongod_runtime_t,s0)
+/usr/lib/systemd/system/mongod.service 	gen_context(system_u:object_r:mongod_unit_file_t,s0)

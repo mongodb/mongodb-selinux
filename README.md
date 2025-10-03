@@ -8,7 +8,7 @@ controls (DAC) are checked.
 
 ## Scope
 
-* policies apply to computers running RHEL7 and RHEL8 only.
+* policies apply to computers running RHEL7, RHEL8, and RHEL9 only.
 * covers standard mongodb-server systemd based installations only.
 * both community and enterprise versions are supported.
 
